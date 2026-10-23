@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AiguaUAB · El agua del campus, a la vista</title>
+<style>
+:root{--bg:#f3f8f8;--surface:#ffffff;--ink:#0c2a38;--muted:#4a6572;--line:#cfe0e3;--accent:#0b7f8c;--warn:#b4472b;--wash:#dcedf0}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0a1a22;--surface:#10252f;--ink:#e6f2f4;--muted:#9fb7c0;--line:#22404c;--accent:#4cc3d1;--warn:#ef8a6b;--wash:#13303b}}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.6 "Segoe UI",system-ui,sans-serif}
+h1,h2,h3{font-family:Georgia,"Iowan Old Style",serif;line-height:1.15;margin:0 0 .5em}
+h1{font-size:clamp(2.2rem,6vw,3.8rem)}
+h2{font-size:clamp(1.5rem,3.5vw,2.1rem)}
+h3{font-size:1.15rem}
+p{max-width:68ch;margin:0 0 1em}
+a{color:var(--accent)}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.wrap{max-width:1040px;margin:0 auto;padding:0 20px}
+header.top{border-bottom:1px solid var(--line)}
+nav{display:flex;gap:18px;flex-wrap:wrap;align-items:center;padding:14px 0}
+nav strong{font-family:Georgia,serif;font-size:1.2rem;margin-right:auto}
+nav a{text-decoration:none;color:var(--muted)}
+nav a:hover{color:var(--ink)}
+.hero{padding:48px 0 36px}
+.hero .lead{font-size:1.15rem;color:var(--muted)}
+.meter{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:20px;margin-top:28px}
+.meter-head{display:flex;gap:16px;flex-wrap:wrap;align-items:end;justify-content:space-between;margin-bottom:12px}
+.meter label{font-size:.9rem;color:var(--muted);display:block}
+select{font:inherit;padding:8px 10px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--ink)}
+.stats{display:flex;gap:28px;flex-wrap:wrap}
+.stats b{display:block;font-family:Georgia,serif;font-size:1.7rem;line-height:1.1}
+.stats span{font-size:.85rem;color:var(--muted)}
+svg{width:100%;height:auto;display:block}
+.axis{stroke:var(--line)} .tick{fill:var(--muted);font-size:11px}
+.area{fill:var(--wash)} .line{fill:none;stroke:var(--accent);stroke-width:2.5}
+.base{stroke:var(--warn);stroke-dasharray:5 4;stroke-width:1.5}
+.alert{margin-top:12px;padding:10px 14px;border-left:4px solid var(--accent);background:var(--wash);border-radius:4px;font-size:.95rem}
+.alert.warn{border-color:var(--warn)}
+.note{font-size:.85rem;color:var(--muted);margin-top:10px}
+section{padding:40px 0;border-top:1px solid var(--line)}
+.cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:24px}
+.cols>div{border-left:3px solid var(--accent);padding-left:14px}
+ul.clean{padding-left:1.1em;max-width:68ch}
+ul.clean li{margin-bottom:.4em}
+footer{border-top:1px solid var(--line);padding:26px 0;color:var(--muted);font-size:.9rem}
+</style>
+</head>
+<body>
+<header class="top"><div class="wrap"><nav>
+<strong>AiguaUAB</strong>
+<a href="#datos">Datos</a><a href="#proyecto">Proyecto</a><a href="#ahorro">Cómo ahorrar</a>
+</nav></div></header>
+
+<main>
+<div class="wrap hero" id="datos">
+<h1>¿Cuánta agua se gasta en el campus de la UAB cada hora?</h1>
+<p class="lead">Un grifo abierto de noche pasa desapercibido. Con un sensor de caudal y una gráfica, deja de pasar desapercibido. Este es el panel que mostrará los datos de nuestro prototipo.</p>
+
+<div class="meter">
+<div class="meter-head">
+<div><label for="zona">Punto de medición</label>
+<select id="zona"><option value="biblio">Biblioteca (aseos)</option><option value="cafe">Cafetería</option><option value="lab">Laboratorio con fuga</option></select></div>
+<div class="stats">
+<div><b id="total">–</b><span>litros en 24 h</span></div>
+<div><b id="pico">–</b><span>hora de mayor uso</span></div>
+<div><b id="noche">–</b><span>L/h de media de 2 a 5 h</span></div>
+</div></div>
+<div id="chart" role="img" aria-label="Gráfica del consumo de agua por hora durante un día"></div>
+<div id="aviso" class="alert" aria-live="polite"></div>
+<p class="note">Datos simulados con fines de demostración. Se sustituirán por las lecturas del prototipo cuando esté conectado.</p>
+</div>
+
+<section id="proyecto"><div class="wrap">
+<h2>Qué hacemos y por qué</h2>
+<p>El agua es un recurso limitado en Cataluña y un campus universitario la usa en aseos, laboratorios, cafeterías y riego, casi siempre sin que quienes la usan vean cuánta. Queremos hacer ese consumo visible en un punto concreto de la UAB y proponer medidas para reducirlo.</p>
+<div class="cols">
+<div><h3>Medir</h3><p>Un microcontrolador ESP32 con un sensor de caudal registra los litros que pasan por una tubería. Si no conseguimos el material, usamos un simulador con el mismo formato de datos.</p></div>
+<div><h3>Mostrar</h3><p>Esta web dibuja las lecturas por hora y marca el caudal mínimo nocturno. Si de madrugada sigue pasando agua, puede haber una fuga.</p></div>
+<div><h3>Actuar</h3><p>Con los datos y las fuentes de la UAB estimaremos cuánta agua se ahorraría con las medidas de abajo.</p></div>
+</div>
+</div></section>
+
+<section id="ahorro"><div class="wrap">
+<h2>Medidas de ahorro que proponemos estudiar</h2>
+<ul class="clean">
+<li><b>Detectar fugas por el consumo nocturno.</b> Cuando el edificio está vacío, el caudal debería ser casi cero.</li>
+<li><b>Grifos y cisternas eficientes.</b> Temporizadores, aireadores y cisternas de doble descarga.</li>
+<li><b>Riego a la hora adecuada.</b> Regar al amanecer o al anochecer reduce la evaporación.</li>
+<li><b>Aviso a la comunidad.</b> Mostrar el consumo de cada edificio ayuda a cambiar hábitos.</li>
+</ul>
+<p class="note">Antes de dar cifras de ahorro de la UAB, las contrastaremos con sus memorias de sostenibilidad y datos oficiales.</p>
+</div></section>
+
+</main>
+
+<footer><div class="wrap">Proyecto final de grupo · Gestión de Proyectos · UAB · Curso 2026-2027</div></footer>
+
+<script>
+(function(){
+  // Perfiles simulados de litros por hora (24 valores). Sustituir por los datos reales del prototipo.
+  var perfiles={
+    biblio:[2,1,1,1,1,3,10,35,80,120,140,130,110,125,135,120,90,60,30,15,8,5,3,2],
+    cafe:[1,1,1,1,2,6,20,60,90,70,55,110,160,120,60,50,45,40,25,10,5,3,2,1],
+    lab:[22,21,22,22,21,23,30,60,95,115,120,110,100,105,110,100,80,55,40,30,26,24,23,22]
+  };
+  var chart=document.getElementById('chart');
+  var W=720,H=300,L=44,R=12,T=14,B=30;
+  function fmt(n){return n.toLocaleString('es-ES')}
+  function dibujar(k){
+    var d=perfiles[k],max=Math.max.apply(null,d)*1.1;
+    var x=function(i){return L+i*(W-L-R)/23};
+    var y=function(v){return T+(H-T-B)*(1-v/max)};
+    var pts=d.map(function(v,i){return x(i)+','+y(v)});
+    var s='<svg viewBox="0 0 '+W+' '+H+'" focusable="false">';
+    [0,.5,1].forEach(function(f){var v=max*f;s+='<line class="axis" x1="'+L+'" x2="'+(W-R)+'" y1="'+y(v)+'" y2="'+y(v)+'"/><text class="tick" x="'+(L-6)+'" y="'+(y(v)+4)+'" text-anchor="end">'+Math.round(v)+'</text>'});
+    for(var h=0;h<24;h+=3){s+='<text class="tick" x="'+x(h)+'" y="'+(H-8)+'" text-anchor="middle">'+h+'h</text>'}
+    s+='<polygon class="area" points="'+x(0)+','+y(0)+' '+pts.join(' ')+' '+x(23)+','+y(0)+'"/>';
+    s+='<polyline class="line" points="'+pts.join(' ')+'"/>';
+    var noche=(d[2]+d[3]+d[4]+d[5])/4;
+    s+='<line class="base" x1="'+x(2)+'" x2="'+x(5)+'" y1="'+y(noche)+'" y2="'+y(noche)+'"/>';
+    s+='<text class="tick" x="'+(W-R)+'" y="'+(T+6)+'" text-anchor="end">litros por hora</text></svg>';
+    chart.innerHTML=s;
+    var total=d.reduce(function(a,b){return a+b},0),pico=d.indexOf(Math.max.apply(null,d));
+    document.getElementById('total').textContent=fmt(total);
+    document.getElementById('pico').textContent=pico+':00';
+    document.getElementById('noche').textContent=fmt(Math.round(noche*10)/10);
+    var a=document.getElementById('aviso'),fuga=noche>10;
+    a.className='alert'+(fuga?' warn':'');
+    a.textContent=fuga?'Posible fuga: de 2 a 5 h pasan unos '+Math.round(noche)+' L/h con el edificio vacío. Conviene revisar las instalaciones.':'Consumo nocturno bajo: no hay señales de fuga en este punto.';
+  }
+  var sel=document.getElementById('zona');
+  sel.addEventListener('change',function(){dibujar(sel.value)});
+  dibujar(sel.value);
+})();
+</script>
+</body>
+</html>
